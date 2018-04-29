@@ -32,9 +32,6 @@ public class MainActivity extends AppCompatActivity implements PdfListAdapter.Ad
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        for (int i = 1; i < 11; i++) {
-//            fileModels.add(new FileModel("Name" + i, "", "" + i + " MB"));
-//        }
         File sdcardObj = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
         listFiles(sdcardObj);
         prepareList();
