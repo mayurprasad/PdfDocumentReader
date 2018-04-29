@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PdfDocumentReader</string>
+    <string name="app_name_with_index">PdfDocumentReader (%1$d/%2$d)</string>
+    <string name="action_settings">Settings</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+</resources>
