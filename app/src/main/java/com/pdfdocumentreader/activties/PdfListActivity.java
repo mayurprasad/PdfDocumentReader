@@ -105,7 +105,6 @@ public class PdfListActivity extends AppCompatActivity implements PdfListAdapter
                 break;
         }
 
-
         intent.putExtra("FileModel", fileModels.get(position));
         startActivity(intent);
     }
@@ -159,13 +158,8 @@ public class PdfListActivity extends AppCompatActivity implements PdfListAdapter
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(
                 R.color.colorPrimary, R.color.colorAccent);
-        swipeRefreshLayout.post(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        new AsyncTaskWS().execute();
-                    }
-                }
+        swipeRefreshLayout.post(() ->
+                new AsyncTaskWS().execute()
         );
     }
 
