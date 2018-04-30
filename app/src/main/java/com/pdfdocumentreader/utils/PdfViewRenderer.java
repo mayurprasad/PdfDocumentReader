@@ -1,43 +1,16 @@
-package com.pdfdocumentreader;
+package com.pdfdocumentreader.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.pdf.PdfRenderer;
-import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.widget.Button;
 import android.widget.Toast;
-
-import com.pdfdocumentreader.utils.TouchImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-public class PdfViewerActivity extends AppCompatActivity {
-    @BindView(R.id.image)
-    TouchImageView pdfView;
-    @BindView(R.id.previous)
-    Button mButtonPrevious;
-    @BindView(R.id.next)
-    Button mButtonNext;
-
-    /**
-     * Key string for saving the state of current page index.
-     */
-    private static final String STATE_CURRENT_PAGE_INDEX = "current_page_index";
-
-    /**
-     * The filename of the PDF.
-     */
-    private static final String FILENAME = "sample.pdf";
-
+public class PdfViewRenderer {
     /**
      * File descriptor of the PDF.
      */
@@ -46,76 +19,22 @@ public class PdfViewerActivity extends AppCompatActivity {
     /**
      * {@link android.graphics.pdf.PdfRenderer} to render the PDF.
      */
-    private PdfRenderer mPdfRenderer;
+    private android.graphics.pdf.PdfRenderer mPdfRenderer;
 
     /**
      * Page that is currently shown on the screen.
      */
-    private PdfRenderer.Page mCurrentPage;
-
-    /**
-     * PDF page index
-     */
-    private int mPageIndex;
+    private android.graphics.pdf.PdfRenderer.Page mCurrentPage;
 
     FileModel fileModel;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pdf_viewer);
-        ButterKnife.bind(this);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        mButtonPrevious.setOnClickListener(view ->
-                // Move to the previous page
-                showPage(mCurrentPage.getIndex() - 1)
-        );
-        mButtonNext.setOnClickListener(view ->
-                // Move to the next page
-                showPage(mCurrentPage.getIndex() + 1)
-        );
-
-        mPageIndex = 0;
-        // If there is a savedInstanceState (screen orientations, etc.), we restore the page index.
-        if (null != savedInstanceState) {
-            mPageIndex = savedInstanceState.getInt(STATE_CURRENT_PAGE_INDEX, 0);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public PdfViewRenderer(Context context, FileModel fileModel) {
+        this.fileModel = fileModel;
         try {
-            Bundle b = getIntent().getExtras();
-            if (b != null) {
-                fileModel = (FileModel) b.getSerializable("FileModel");
-                openRenderer(this);
-                showPage(mPageIndex);
-            }
+            openRenderer(context);
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "Error! " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        try {
-            closeRenderer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        super.onStop();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (null != mCurrentPage) {
-            outState.putInt(STATE_CURRENT_PAGE_INDEX, mCurrentPage.getIndex());
+            Toast.makeText(context, "Error! " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -126,7 +45,7 @@ public class PdfViewerActivity extends AppCompatActivity {
         // In this sample, we read a PDF from the assets directory.
         File file = new File(fileModel.getPath());
         if (!file.exists()) {
-            // Since PdfRenderer cannot handle the compressed asset file directly, we copy it into
+            // Since PdfViewRenderer cannot handle the compressed asset file directly, we copy it into
             // the cache directory.
             InputStream asset = context.getAssets().open(fileModel.getName());
             FileOutputStream output = new FileOutputStream(file);
@@ -139,9 +58,9 @@ public class PdfViewerActivity extends AppCompatActivity {
             output.close();
         }
         mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-        // This is the PdfRenderer we use to render the PDF.
+        // This is the PdfViewRenderer we use to render the PDF.
         if (mFileDescriptor != null) {
-            mPdfRenderer = new PdfRenderer(mFileDescriptor);
+            mPdfRenderer = new android.graphics.pdf.PdfRenderer(mFileDescriptor);
         }
     }
 
@@ -150,7 +69,7 @@ public class PdfViewerActivity extends AppCompatActivity {
      *
      * @throws java.io.IOException When the PDF file cannot be closed.
      */
-    private void closeRenderer() throws IOException {
+    public void closeRenderer() throws IOException {
         if (null != mCurrentPage) {
             mCurrentPage.close();
         }
@@ -163,11 +82,11 @@ public class PdfViewerActivity extends AppCompatActivity {
      *
      * @param index The page index.
      */
-    private void showPage(int index) {
-        pdfView.resetZoom();
+    public Bitmap showPage(int index) {
+        //pdfView.resetZoom();
         //float currentZoomLevel = pdfView.getCurrentZoom();
         if (mPdfRenderer.getPageCount() <= index) {
-            return;
+            return null;
         }
         // Make sure to close the current page before opening another one.
         if (null != mCurrentPage) {
@@ -194,23 +113,9 @@ public class PdfViewerActivity extends AppCompatActivity {
         // To render a portion of the page, use the second and third parameter. Pass nulls to get
         // the default result.
         // Pass either RENDER_MODE_FOR_DISPLAY or RENDER_MODE_FOR_PRINT for the last parameter.
-        mCurrentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+        mCurrentPage.render(bitmap, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
         // We are ready to show the Bitmap to user.
-        pdfView.setImageBitmap(bitmap);
-//        Drawable dr = new BitmapDrawable(bitmap);
-//        pdfView.setBackgroundDrawable(dr);
-        updateUi();
-    }
-
-    /**
-     * Updates the state of 2 control buttons in response to the current page index.
-     */
-    private void updateUi() {
-        int index = mCurrentPage.getIndex();
-        int pageCount = mPdfRenderer.getPageCount();
-        mButtonPrevious.setEnabled(0 != index);
-        mButtonNext.setEnabled(index + 1 < pageCount);
-        setTitle(getString(R.string.app_name_with_index, index + 1, pageCount));
+        return bitmap;
     }
 
     /**
@@ -221,5 +126,4 @@ public class PdfViewerActivity extends AppCompatActivity {
     public int getPageCount() {
         return mPdfRenderer.getPageCount();
     }
-
 }

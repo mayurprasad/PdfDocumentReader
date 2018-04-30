@@ -1,9 +1,16 @@
-package com.pdfdocumentreader;
+package com.pdfdocumentreader.utils;
+
+import android.graphics.Bitmap;
 
 import java.io.Serializable;
 
 public class FileModel implements Serializable {
     String name, path, size;
+    Bitmap bitmap;
+
+    public FileModel(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
 
     public FileModel(String name, String path) {
         this.name = name;
@@ -16,27 +23,19 @@ public class FileModel implements Serializable {
         this.size = size;
     }
 
-    public String getName() {
-        return name;
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public String getSize() {
         return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
     }
 }

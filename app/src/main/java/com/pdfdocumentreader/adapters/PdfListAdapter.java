@@ -1,4 +1,4 @@
-package com.pdfdocumentreader;
+package com.pdfdocumentreader.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,12 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.pdfdocumentreader.R;
+import com.pdfdocumentreader.utils.FileModel;
 import com.pdfdocumentreader.utils.UtilsFunction;
 
 import java.util.ArrayList;
 
 /**
- * Created by mayur.p on 10/11/2017.
+ * Created by mayur.p on 29/4/2018.
  */
 
 public class PdfListAdapter extends RecyclerView.Adapter<PdfListAdapter.MyViewHolder> {

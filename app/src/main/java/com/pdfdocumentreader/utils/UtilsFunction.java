@@ -1,17 +1,24 @@
 package com.pdfdocumentreader.utils;
 
-import android.app.Activity;
-import android.content.Context;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import java.io.File;
 
 /**
- * Created by mayur.p on 7/27/2017.
+ * Created by mayur.p on 29/4/2018.
  */
 
 public class UtilsFunction {
 
-    public boolean isNullString(String check_str) {
+    public static String getFileSize(File file) {
+        // Get length of file in bytes
+        long fileSizeInBytes = file.length();
+// Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
+        long fileSizeInKB = fileSizeInBytes / 1024;
+// Convert the KB to MegaBytes (1 MB = 1024 KBytes)
+        long fileSizeInMB = fileSizeInKB / 1024;
+        return (fileSizeInMB > 1) ? "" + fileSizeInMB + " MB" : "" + fileSizeInKB + " KB";
+    }
+
+    public static boolean isNullString(String check_str) {
         boolean isNull = false;
         if (check_str != null) {
             if (check_str.trim().equals("null") || check_str.trim().equals("")) {
@@ -23,7 +30,7 @@ public class UtilsFunction {
         return isNull;
     }
 
-    public String isNullStringReturnBlank(String check_str) {
+    public static String isNullStringReturnBlank(String check_str) {
         String str = check_str;
         boolean isNull = false;
         if (check_str != null) {
@@ -34,18 +41,5 @@ public class UtilsFunction {
             str = "";
         }
         return str;
-    }
-
-    public void closeKeyboard(Activity activity) {
-        try {
-            // Check if no view has focus:
-            View ketView = activity.getCurrentFocus();
-            if (ketView != null) {
-                InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(ketView.getWindowToken(), 0);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
